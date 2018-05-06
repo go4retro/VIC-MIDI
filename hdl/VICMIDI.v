@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module VICMIDI(reset, clock, r_w, address, data, uart_en, mem_en, io, io_sel, flash_ce, ram_ce, we, oe, uart_ce, ram1,ram2,ram3, blk1, blk2, blk3, blk5, base, bank, midi_txd, midi_rxd, rs232_txd, rs232_rxd, txd, rxd, ser_sel, uart_irq, irq, nmi, uart_reset);
+module vicmidi(reset, clock, r_w, address, data, uart_en, mem_en, io, io_sel, flash_ce, ram_ce, we, oe, uart_ce, ram1,ram2,ram3, blk1, blk2, blk3, blk5, base, bank, midi_txd, midi_rxd, rs232_txd, rs232_rxd, txd, rxd, ser_sel, uart_irq, irq, nmi, uart_reset);
 inout reset;
 input clock;
 input r_w;
@@ -89,9 +89,9 @@ assign io_uart = io[3];
 
 assign io_reg = io[2];
 
-assign ram_sel = (!ram1 | !ram2 | !ram3); // active low
+assign ram_sel = (!ram1 | !ram2 | !ram3); // active high
 
-assign midi_txd = (ser_sel ? midi_rxd : txd);
+assign midi_txd = (ser_sel ? 0 : txd);
 assign rs232_txd = (ser_sel ? txd : rs232_rxd);
 assign rxd = (ser_sel ? rs232_rxd : midi_rxd);
 
@@ -102,8 +102,8 @@ assign uart_reset = !reset;
 
 // 00 off
 // 01	rom
-// 10	ram
-// 11 ram no write
+// 10	ram no write
+// 11 ram
 
 assign ram_rom_en  = (cart_config1[1:0] == 'b01);
 assign blk1_rom_en = (cart_config2[1:0] == 'b01);
@@ -117,26 +117,22 @@ assign blk2_ram_en = (cart_config2[3] == 1);
 assign blk3_ram_en = (cart_config2[5] == 1);
 assign blk5_ram_en = (cart_config2[7] == 1);
 
-assign ram_ram_write_en  = (cart_config1[1:0] == 'b10);
-assign blk1_ram_write_en = (cart_config2[1:0] == 'b10);
-assign blk2_ram_write_en = (cart_config2[3:2] == 'b10);
-assign blk3_ram_write_en = (cart_config2[5:4] == 'b10);
-assign blk5_ram_write_en = (cart_config2[7:6] == 'b10);
+assign ram_write_en  = (cart_config1[0] == 'b1);
+assign blk1_write_en = (cart_config2[0] == 'b1);
+assign blk2_write_en = (cart_config2[2] == 'b1);
+assign blk3_write_en = (cart_config2[4] == 'b1);
+assign blk5_write_en = (cart_config2[6] == 'b1);
 
 //assign reg_base = !(base);
 assign reg_base = 0;
 
-//assign reg_base = 0;
-
 //assign flash_ce = ! (!mem_en & (((ram_sel & ram_rom_en) | (!blk1 & blk1_rom_en) | (!blk2 & blk2_rom_en) | (!blk3 & blk3_rom_en) | (!blk5 & blk5_rom_en)))); //active low
-//assign flash_ce = ! ((((ram_sel & ram_rom_en) | (!blk1 & blk1_rom_en) | (!blk2 & blk2_rom_en) | (!blk3 & blk3_rom_en) | (!blk5 & blk5_rom_en)))); //active low
-assign flash_ce = 1;
+assign flash_ce = ! ((((ram_sel & ram_rom_en) | (!blk1 & blk1_rom_en) | (!blk2 & blk2_rom_en) | (!blk3 & blk3_rom_en) | (!blk5 & blk5_rom_en)))); //active low
 
 //assign ram_ce = ! ( !mem_en & (((ram_sel & ram_ram_en) | (!blk1 & blk1_ram_en) | (!blk2 & blk2_ram_en) | (!blk3 & blk3_ram_en) | (!blk5 & blk5_ram_en)))); //active low
 assign ram_ce =  !((((ram_sel & ram_ram_en) | (!blk1 & blk1_ram_en) | (!blk2 & blk2_ram_en) | (!blk3 & blk3_ram_en) | (!blk5 & blk5_ram_en)))); //active low
 
-
-assign we = !(!r_w & ((ram_ram_write_en & ram_sel) | (blk1_ram_write_en & !blk1) | (blk2_ram_write_en & !blk2) | (blk3_ram_write_en & !blk3) | (blk5_ram_write_en & !blk5))); // active low
+assign we = !(!r_w & ((ram_write_en & ram_sel) | (blk1_write_en & !blk1) | (blk2_write_en & !blk2) | (blk3_write_en & !blk3) | (blk5_write_en & !blk5))); // active low
 assign oe = !(r_w);  // active low
 
 //assign reg_ce = (!mem_en & !io_reg & !cart_config1[6] & is_reg_addr_valid); // active high
@@ -174,7 +170,7 @@ assign reset_reg =               (reset_ctr != 0 ? 0 : !reset);
 // instances
 /*
 	Config 1:
-	0-1: RAM Config (00 = absent, 01 = ROM, 10 = RAM R/W, 11 = RAM RO)
+	0-1: RAM Config (00 = absent, 01 = ROM, 10 = RAM R/O, 11 = RAM R/W)
 	3:2: RAM high bank
 	4: 0
 	5: 0
@@ -184,10 +180,10 @@ assign reset_reg =               (reset_ctr != 0 ? 0 : !reset);
 register #(.WIDTH(4))	        cart_config1_reg(clock, reset_reg, cart_config1_reg_ce, {data[3:0]}, cart_config1);
 /*
 	Config 2:
-	1-0: BLK1 Config (00 = absent, 01 = ROM, 10 = RAM R/W, 11 = RAM RO) $2000
-	3-2: BLK2 Config (00 = absent, 01 = ROM, 10 = RAM R/W, 11 = RAM RO) $4000 
-	5-4: BLK3 Config (00 = absent, 01 = ROM, 10 = RAM R/W, 11 = RAM RO) $6000
-	7-6: BLK5 Config (00 = absent, 01 = ROM, 10 = RAM R/W, 11 = RAM RO) $a000 // default is BLK5 ROM enabled.
+	1-0: BLK1 Config (00 = absent, 01 = ROM, 10 = RAM R/O, 11 = RAM R/W) $2000
+	3-2: BLK2 Config (00 = absent, 01 = ROM, 10 = RAM R/O, 11 = RAM R/W) $4000 
+	5-4: BLK3 Config (00 = absent, 01 = ROM, 10 = RAM R/O, 11 = RAM R/W) $6000
+	7-6: BLK5 Config (00 = absent, 01 = ROM, 10 = RAM R/O, 11 = RAM R/W) $a000 // default is BLK5 ROM enabled.
 */
 register #(.RESET('b01000000))  cart_config2_reg(clock, reset_reg, cart_config2_reg_ce, data, cart_config2);
 register #(.WIDTH(8))	        bank_hi_reg(clock, reset_reg, bank_hi_reg_ce, data[7:0], bank_hi_data);
