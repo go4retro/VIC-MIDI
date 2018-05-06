@@ -34,8 +34,10 @@ module vicmidi(
 					we, 
 					oe, 
 					uart_ce, 
-					ram1,
-					ram2,
+					uart_we, 
+					uart_oe, 
+					ram1, 
+					ram2, 
 					ram3, 
 					blk1, 
 					blk2, 
@@ -49,6 +51,8 @@ module vicmidi(
 					rs232_rxd, 
 					txd, 
 					rxd, 
+					rxd_led, 
+					txd_led, 
 					ser_sel, 
 					uart_irq, 
 					irq, 
@@ -69,7 +73,6 @@ input 	[3:2] io;
 input 	io_sel;
 output 	flash_ce;
 output 	ram_ce;
-output 	uart_ce;
 output 	we;
 output 	oe;
 input 	ram1;
@@ -80,12 +83,15 @@ input 	blk2;
 input 	blk3;
 input 	blk5;
 input 	[6:0]base;
-output 	[5:0]bank;
-
+output 	[18:13]bank;
 output 	act_led;
 input 	[1:0]switch;
 output  	irq;
 output  	nmi;
+
+output 	uart_ce;
+output 	uart_oe;
+output 	uart_we;
 
 output  	midi_txd;
 input   	midi_rxd;
@@ -93,6 +99,8 @@ output  	rs232_txd;
 input   	rs232_rxd;
 input   	txd;
 output  	rxd;
+output  	rxd_led;
+output  	txd_led;
 input   	ser_sel;
 input   	uart_irq;
 output  	uart_reset;
@@ -104,8 +112,7 @@ wire 		reset_out;
 wire 		data_read;  // we don't use this...
 
 // assigns
-//assign io_uart = 						(io_sel ? io[3] : io[2]);
-assign io_uart = 						io[3];
+assign io_uart = 						(io_sel ? io[3] : io[2]);
 
 assign midi_txd = 					(ser_sel ? 0 : txd);
 assign rs232_txd = 					(ser_sel ? txd : rs232_rxd);
@@ -114,8 +121,11 @@ assign rxd = 							(ser_sel ? rs232_rxd : midi_rxd);
 assign irq = 							(uart_irq ? 0 : 1'bz);  // negate IRQ from RS232
 assign nmi = 							1'bz;
 assign uart_reset = 					!reset;
-assign uart_ce = 						(!uart_en & !io_uart & (address[9:3] == base[6:0])); // active high
-
+assign uart_ce = 						(clock & !uart_en & !io_uart & (address[9:3] == base[6:0])); // active high
+assign uart_oe =                 clock & !r_w;
+assign uart_we =                 clock & r_w;
+assign rxd_led =                 (!rxd ? 0 : 1'bz);
+assign txd_led =                 (!txd ? 0 : 1'bz);
 assign act_led =                 (led ? 0 : 1'bz);
 assign reset =                	(!reset_out ? 0 : 1'bz);  // reset_out is active low
 
@@ -143,7 +153,7 @@ MemExpander #(.WIDTH(6), .MEMEXPANDER_ID('b00010010))			MemExpander1((!mem_en & 
 															 blk2, 
 															 blk3, 
 															 blk5, 
-															 bank[5:0],
+															 bank[18:13],
 															 led,
 															 switch,
 															 data_read

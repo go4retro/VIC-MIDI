@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2016-01-11T19:12:22</DateModified>
+  <DateModified>2016-09-10T23:10:36</DateModified>
   <ModuleName>vicmidi</ModuleName>
-  <SummaryTimeStamp>2015-12-14T00:32:15</SummaryTimeStamp>
-  <SavedFilePath>C:/Users/brain/projects/VICMIDI/hdl1.0/iseconfig/vicmidi.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/brain/projects/VICMIDI/hdl1.0\</ImplementationReportsDirectory>
+  <SummaryTimeStamp>2015-12-30T16:53:56</SummaryTimeStamp>
+  <SavedFilePath>C:/Users/brain/projects/VICMIDI/hdl1.0b/iseconfig/vicmidi.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>C:/Users/brain/projects/VICMIDI/hdl1.0b\</ImplementationReportsDirectory>
   <DateInitialized>2015-09-14T01:02:49</DateInitialized>
   <EnableMessageFiltering>true</EnableMessageFiltering>
  </header>

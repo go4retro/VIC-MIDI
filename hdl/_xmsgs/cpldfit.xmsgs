@@ -14,13 +14,22 @@
 <msg type="info" file="Cpld" num="0" delta="new" >Inferring BUFG constraint for signal &apos;<arg fmt="%s" index="1">r_w</arg>&apos; based upon the LOC constraint &apos;<arg fmt="%s" index="2">P23</arg>&apos;. It is recommended that you declare this BUFG explicitedly in your design. Note that for certain device families the output of a BUFG constraint can not drive a gated clock, and the BUFG constraint will be ignored.
 </msg>
 
-<msg type="warning" file="Cpld" num="1007" delta="new" >Removing unused input(s) &apos;<arg fmt="%s" index="1">io_sel</arg>&apos;.  The input(s) are unused after optimization. Please verify functionality via simulation.
-</msg>
-
 <msg type="warning" file="Cpld" num="1239" delta="old" >The global <arg fmt="%s" index="1">clock</arg> designation (BUFG) on signal &apos;<arg fmt="%s" index="2">r_w_IBUF</arg>&apos; is ignored. Most likely the signal is gated and therefore cannot be used as a global control signal.
 </msg>
 
 <msg type="info" file="Cpld" num="994" delta="old" >Exhaustive fitting is trying <arg fmt="%s" index="1">pterm limit</arg>: <arg fmt="%d" index="2">5</arg> and <arg fmt="%s" index="3">input limit</arg>: <arg fmt="%d" index="4">28</arg>
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">data&lt;2&gt;</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">data&lt;1&gt;</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">data&lt;0&gt;</arg> to allow all signals assigned to this function block to be placed.
+</msg>
+
+<msg type="warning" file="Cpld" num="895" delta="old" >Unable to map all desired signals into function block, FB<arg fmt="%d" index="1">8</arg>, because too many function block inputs are required. Buffering output signal <arg fmt="%s" index="2">data&lt;5&gt;</arg> to allow all signals assigned to this function block to be placed.
 </msg>
 
 </messages>
