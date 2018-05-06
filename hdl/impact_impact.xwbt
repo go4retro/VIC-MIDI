@@ -1,0 +1,8 @@
+INTSTYLE=impact
+INFILE=C:\Users\brain\projects\VICMIDI\hdl\impact.xsl
+OUTFILE=C:\Users\brain\projects\VICMIDI\hdl\impact.xsl
+FAMILY=Single
+PART=Single
+WORKINGDIR=C:\Users\brain\projects\VICMIDI\hdl
+LICENSE=iMPACT
+USER_INFO=iMPACT
